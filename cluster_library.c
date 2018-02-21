@@ -1449,8 +1449,14 @@ PHP_REDIS_API short cluster_send_command(redisCluster *c, short slot, const char
         zend_throw_exception(redis_cluster_exception_ce,
             "The Redis Cluster is down (CLUSTERDOWN)", 0 TSRMLS_CC);
         return -1;
-    } else if (timedout) {
+    }
+    else if (resp < 0) {
         cluster_reset_cmd_slot(c TSRMLS_CC);
+
+        zend_throw_exception(redis_cluster_exception_ce,
+            "Error occured while excuting the command on the cluster", 0 TSRMLS_CC);
+    }
+    else if (timedout) {
         zend_throw_exception(redis_cluster_exception_ce,
             "Timed out attempting to find data in the correct node!", 0 TSRMLS_CC);
     }
